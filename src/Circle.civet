@@ -56,7 +56,7 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
       unless map.has i
         map.set i, color
         j .= cc[i].target.i
-        until i is j
+        until map.has j
           map.set j, color
           j = cc[j].target.i
         color++

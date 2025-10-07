@@ -1,4 +1,4 @@
-{ createSignal, For } from solid-js
+{ createMemo, createSignal, For } from solid-js
 { renderToString } from katex
 
 r := String.raw
@@ -38,7 +38,7 @@ export function Zeller()
   term5 := => J() %/ 4
   term6 := => -2 * J()
   sum := => term1() + term2() + term3() + term4() + term5() + term6()
-  h := => sum() %% 7
+  h := createMemo => sum() %% 7
 
   <div .zeller>
     <p>Choose a date to compute the day of the week via <a href="https://en.wikipedia.org/wiki/Zeller%27s_congruence" target="_blank">Zeller's Congruence</a>:
