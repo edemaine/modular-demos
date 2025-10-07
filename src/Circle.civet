@@ -1,0 +1,66 @@
+{ createMemo, createSignal, For } from 'solid-js'
+
+export function Circle(props: {neighbor: (i: number, n: number, a: number) => number})
+  [n, setN] := createSignal 10
+  [a, setA] := createSignal 2
+
+  radius := 40
+  centerX := 50
+  centerY := 50
+
+  dots := createMemo =>
+    nn := n()
+    for i of [0..<nn]
+      angle := (2 * Math.PI * i) / nn
+      i: i
+      x: centerX + radius * Math.cos angle
+      y: centerY + radius * Math.sin angle
+
+  connections := () =>
+    aa := a()
+    nn := n()
+    dd := dots()
+    for dot, i of dd
+      targetIndex := props.neighbor i, nn, aa
+      target .= dd[targetIndex]
+      if targetIndex is i
+        target =
+          i: i
+          x: (1 + 20 / radius) * (dot.x - centerX) + centerX
+          y: (1 + 20 / radius) * (dot.y - centerY) + centerY
+      dx := target.x - dot.x
+      dy := target.y - dot.y
+      dist := Math.sqrt dx*dx + dy*dy
+      shorten := 5
+      shortenedTo := if dist <= shorten then target else
+        x: target.x - dx * shorten / dist
+        y: target.y - dy * shorten / dist
+      { from: dot, to: shortenedTo, target }
+
+  <div .component>
+    <div .controls>
+      <label>
+        <i>n</i>:
+        <input type="range" min=1 max=25 value=n() onInput=
+          (e) => setN Number e.target.value
+        >
+        <input type="number" min=1 max=25 value=n() onInput=
+          (e) => setN Number e.target.value
+        >
+      <label>
+        <i>a</i>:
+        <input type="range" min=1 max=n() value=a() onInput=
+          (e) => setA Number e.target.value
+        >
+        <input type="number" min=1 max=n() value=a() onInput=
+          (e) => setA Number e.target.value
+        >
+    <svg viewBox="0 0 100 100">
+      <marker #arrow markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,3 L4,1.5 z" fill="yellow">
+      <For each=connections()>
+        (conn) =>
+          <line x1=conn.from.x y1=conn.from.y x2=conn.to.x y2=conn.to.y stroke="white" stroke-width=2 marker-end="url(#arrow)">
+      <For each=dots()>
+        (dot) =>
+          <circle cx=dot.x cy=dot.y r={6 - n() / 10}>

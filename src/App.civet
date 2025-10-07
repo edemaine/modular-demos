@@ -1,2 +1,28 @@
+"civet jsxCode"
+
+{ createSignal, Switch, Match } from solid-js
+{ Circle } from ./Circle.civet
+
+tabTitles := ['Multiplication', 'Addition']
+tabTitleToName := (tab) => tab.toLowerCase()
+//tabNames := tabTitles.map tabTitleToName
+
 export function App()
-  <h1>Hello, World!
+  [activeTab, setActiveTab] := createSignal tabTitleToName tabTitles[0]
+
+  <div .tabs>
+    for tab of tabTitles
+      <button class=
+        if activeTab() is tabTitleToName tab then 'active'
+      onClick=
+        => setActiveTab tabTitleToName tab
+      >tab
+  <Switch>
+    <Match when={activeTab() is 'addition'}>
+      <Circle neighbor=
+        (i: number, n: number, a: number) => (i + a) % n
+      >
+    <Match when={activeTab() is 'multiplication'}>
+      <Circle neighbor=
+        (i: number, n: number, a: number) => (i * a) % n
+      >
