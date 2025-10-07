@@ -1,5 +1,15 @@
 { createMemo, createSignal, For } from 'solid-js'
 
+colorMap :=
+  . 'yellow'
+  . 'orange'
+  . 'red'
+  . 'purple'
+  . 'green'
+  . 'blue'
+  . 'indigo'
+  . 'violet'
+
 export function Circle(props: {neighbor: (i: number, n: number, a: number) => number})
   [n, setN] := createSignal 10
   [a, setA] := createSignal 2
@@ -16,7 +26,7 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
       x: centerX + radius * Math.cos angle
       y: centerY + radius * Math.sin angle
 
-  connections := () =>
+  connections := createMemo =>
     aa := a()
     nn := n()
     dd := dots()
@@ -37,8 +47,23 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
         y: target.y - dy * shorten / dist
       { from: dot, to: shortenedTo, target }
 
-  <div .circle>
-    <div .controls>
+  colors := createMemo =>
+    map := new Map<number, number>
+    dd := dots()
+    cc := connections()
+    color .= 0
+    for i of [0..<dd#]
+      unless map.has i
+        map.set i, color
+        j .= cc[i].target.i
+        until i is j
+          map.set j, color
+          j = cc[j].target.i
+        color++
+      map.get(i)!
+
+  <.circle>
+    <.controls>
       <label>
         <i>n</i>:
         <input type="range" min=1 max=25 value=n() onInput=
@@ -60,14 +85,15 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
         <stop offset="0%" stop-color="purple">
         <stop offset="100%" stop-color="#4B0082">
       </radialGradient>
-      <marker #arrow markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto" markerUnits="strokeWidth">
-        <path d="M0,0 L0,3 L4,1.5 z" fill="yellow">
       <For each=connections()>
         (conn, i) =>
+          color := createMemo => colorMap[colors()[i()] %% colorMap#]
+          <marker id=`arrow-${i()}` markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,3 L4,1.5 z" fill=color()>
           <linearGradient id=`grad-${i()}` x1={conn.from.x} y1={conn.from.y} x2={conn.to.x} y2={conn.to.y} gradientUnits="userSpaceOnUse">
             <stop offset="0%" stop-color="white">
-            <stop offset="100%" stop-color="yellow">
-          <line x1=conn.from.x y1=conn.from.y x2=conn.to.x y2=conn.to.y stroke=`url(#grad-${i()})` stroke-width=2 marker-end="url(#arrow)">
+            <stop offset="100%" stop-color=color()>
+          <line x1=conn.from.x y1=conn.from.y x2=conn.to.x y2=conn.to.y stroke=`url(#grad-${i()})` stroke-width=2 marker-end=`url(#arrow-${i()})`>
       <For each=dots()>
         (dot) =>
           <circle cx=dot.x cy=dot.y r={6 - n() / 10}>

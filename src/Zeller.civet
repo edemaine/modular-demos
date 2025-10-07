@@ -3,6 +3,15 @@
 
 r := String.raw
 
+days :=
+  . 'Saturday'
+  . 'Sunday'
+  . 'Monday'
+  . 'Tuesday'
+  . 'Wednesday'
+  . 'Thursday'
+  . 'Friday'
+
 export function Zeller()
   now := new Date()
   [day, setDay] := createSignal now.getDate()
@@ -30,8 +39,6 @@ export function Zeller()
   term6 := => -2 * J()
   sum := => term1() + term2() + term3() + term4() + term5() + term6()
   h := => sum() %% 7
-
-  days := ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
   <div .zeller>
     <p>Choose a date to compute the day of the week via <a href="https://en.wikipedia.org/wiki/Zeller%27s_congruence" target="_blank">Zeller's Congruence</a>:
