@@ -43,3 +43,6 @@ export function App()
       >
     <Match when={activeTab() is 'zeller'}>
       <Zeller>
+  <footer>
+    <a href="https://github.com/edemaine/modular-demos" target="_blank">
+      'Source code on GitHub'
