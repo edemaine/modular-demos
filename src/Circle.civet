@@ -56,11 +56,18 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
           (e) => setA Number e.target.value
         >
     <svg viewBox="0 0 100 100">
+      <radialGradient #circleGradient cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="purple">
+        <stop offset="100%" stop-color="#4B0082">
+      </radialGradient>
       <marker #arrow markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto" markerUnits="strokeWidth">
         <path d="M0,0 L0,3 L4,1.5 z" fill="yellow">
       <For each=connections()>
-        (conn) =>
-          <line x1=conn.from.x y1=conn.from.y x2=conn.to.x y2=conn.to.y stroke="white" stroke-width=2 marker-end="url(#arrow)">
+        (conn, i) =>
+          <linearGradient id=`grad-${i()}` x1={conn.from.x} y1={conn.from.y} x2={conn.to.x} y2={conn.to.y} gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="white">
+            <stop offset="100%" stop-color="yellow">
+          <line x1=conn.from.x y1=conn.from.y x2=conn.to.x y2=conn.to.y stroke=`url(#grad-${i()})` stroke-width=2 marker-end="url(#arrow)">
       <For each=dots()>
         (dot) =>
           <circle cx=dot.x cy=dot.y r={6 - n() / 10}>
