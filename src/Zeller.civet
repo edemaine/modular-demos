@@ -12,6 +12,11 @@ days :=
   . 'Thursday'
   . 'Friday'
 
+function display(n: number): string
+  n.toFixed 2
+  .replace /\.(\d*?)0+$/g, '$1'
+  .replace /\.$/g, ''
+
 export function Zeller()
   now := new Date()
   [day, setDay] := createSignal now.getDate()
@@ -71,17 +76,17 @@ export function Zeller()
           h &=
           \underbrace{
           \left(
-          \underbrace{d}_{${day()}} +
-          \Bigg⌊\underbrace{\frac{13}{5}(\underbrace{m+1}_{${adjustedMonth()+1}})}_{${13/5*(adjustedMonth()+1)}}\Bigg⌋ +
-          \underbrace{y \rem 100}_{${adjustedYear() %% 100}} +
-          \Bigg⌊\underbrace{\frac{y \rem 100}{4}}_{${(adjustedYear() %% 100) / 4}}\Bigg⌋ +
-          \Bigg⌊\underbrace{\frac{y \div 100}{4}}_{${(adjustedYear() %/ 100) / 4}}\Bigg⌋ -
-          \underbrace{2 \, (\underbrace{y \div 100}_{${adjustedYear() %/ 100}})}_{${2 * (adjustedYear() %/ 100)}}
+          \underbrace{d}_{${display day()}} +
+          \Bigg⌊\underbrace{\frac{13}{5}(\underbrace{m+1}_{${display adjustedMonth()+1}})}_{${display 13/5*(adjustedMonth()+1)}}\Bigg⌋ +
+          \underbrace{y \rem 100}_{${display adjustedYear() %% 100}} +
+          \Bigg⌊\underbrace{\frac{y \rem 100}{4}}_{${display (adjustedYear() %% 100) / 4}}\Bigg⌋ +
+          \Bigg⌊\underbrace{\frac{y \div 100}{4}}_{${display (adjustedYear() %/ 100) / 4}}\Bigg⌋ -
+          \underbrace{2 \, (\underbrace{y \div 100}_{${display adjustedYear() %/ 100}})}_{${display 2 * (adjustedYear() %/ 100)}}
           \right)
-          }_{${sum()}}
+          }_{${display sum()}}
           \rem 7
           \\
-          &= ${h()} \quad \text{(${days[h()]})}
+          &= ${display h()} \quad \text{(${days[h()]})}
           \end{align*}
           `
         displayMode: true
