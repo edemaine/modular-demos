@@ -17,6 +17,7 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
   radius := 40
   centerX := 50
   centerY := 50
+  r := => 6 - n() / 8
 
   dots := createMemo =>
     nn := n()
@@ -96,4 +97,6 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
           <line x1=conn.from.x y1=conn.from.y x2=conn.to.x y2=conn.to.y stroke=`url(#grad-${i()})` stroke-width=2 marker-end=`url(#arrow-${i()})`>
       <For each=dots()>
         (dot) =>
-          <circle cx=dot.x cy=dot.y r={6 - n() / 10}>
+          <circle cx=dot.x cy=dot.y r=r()>
+          <text x=dot.x y=dot.y font-size=`${1.2 * r()}px`>
+            {dot.i}
