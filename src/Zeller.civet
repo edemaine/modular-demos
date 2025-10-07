@@ -43,26 +43,26 @@ export function Zeller()
   <div .zeller>
     <p>Choose a date to compute the day of the week via <a href="https://en.wikipedia.org/wiki/Zeller%27s_congruence" target="_blank">Zeller's Congruence</a>:
     <.inputs>
-      <label> Day:
-        <input type="number" min=1 max=31 value=day() onInput=
-          (e) => setDay Number e.target.value
+      <label> Year:
+        <input type="number" min=1 max=9999 value=year() onInput=
+          (e) => setYear Number e.target.value
         >
       <label> Month:
         <input type="number" min=1 max=12 value=month() onInput=
           (e) => setMonth Number e.target.value
         >
-      <label> Year:
-        <input type="number" min=1 max=9999 value=year() onInput=
-          (e) => setYear Number e.target.value
+      <label> Day:
+        <input type="number" min=1 max=31 value=day() onInput=
+          (e) => setDay Number e.target.value
         >
     <p>Adjusted for January and February as months 13 and 14 of the previous year:
     <.inputs>
-      <label> Day:
-        <input disabled value=day()>
-      <label> Month:
-        <input disabled value=adjustedMonth()>
       <label> Year:
         <input disabled value=adjustedYear()>
+      <label> Month:
+        <input disabled value=adjustedMonth()>
+      <label> Day:
+        <input disabled value=day()>
     <hr>
     <div innerHTML=
       renderToString
