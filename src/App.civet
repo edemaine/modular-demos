@@ -16,14 +16,13 @@ function hashToTab(): string
     tabTitleToName tabTitles[0] // first tab by default
 
 export function App()
-  [activeTab, setActiveTab] := createSignal hashToTab()
+  [activeTab, _setActiveTab] := createSignal hashToTab()
+  function setActiveTab(tab: string)
+    _setActiveTab tab
+    history.replaceState null, '', `#${tab}`
 
-  window.addEventListener 'hashchange', =>
-    setActiveTab hashToTab()
-
-  createEffect =>
-    if window.location.hash[1..] !== activeTab()
-      window.location.hash = activeTab()
+  window.addEventListener 'popstate', =>
+    _setActiveTab hashToTab()
 
   <.tabs>
     for tab of tabTitles
