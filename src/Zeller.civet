@@ -1,0 +1,91 @@
+{ createSignal, For } from solid-js
+{ renderToString } from katex
+
+r := String.raw
+
+export function Zeller()
+  now := new Date()
+  [day, setDay] := createSignal now.getDate()
+  [month, setMonth] := createSignal now.getMonth() + 1
+  [year, setYear] := createSignal now.getFullYear()
+
+  adjustedMonth := =>
+    if month() is 1 or month() is 2
+      month() + 12
+    else
+      month()
+  adjustedYear := =>
+    if month() is 1 or month() is 2
+      year() - 1
+    else
+      year()
+
+  term1 := => day()
+  term2 := => Math.floor (13 * (adjustedMonth() + 1)) / 5
+  K := => adjustedYear() %% 100
+  term3 := => K()
+  term4 := => K() %/ 4
+  J := => adjustedYear() %/ 100
+  term5 := => J() %/ 4
+  term6 := => -2 * J()
+  sum := => term1() + term2() + term3() + term4() + term5() + term6()
+  h := => sum() %% 7
+
+  days := ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+  <div .zeller>
+    <p>Choose a date to compute the day of the week via <a href="https://en.wikipedia.org/wiki/Zeller%27s_congruence" target="_blank">Zeller's Congruence</a>:
+    <.inputs>
+      <label> Day:
+        <input type="number" min=1 max=31 value=day() onInput=
+          (e) => setDay Number e.target.value
+        >
+      <label> Month:
+        <input type="number" min=1 max=12 value=month() onInput=
+          (e) => setMonth Number e.target.value
+        >
+      <label> Year:
+        <input type="number" min=1 max=9999 value=year() onInput=
+          (e) => setYear Number e.target.value
+        >
+    <p>Adjusted for January and February as months 13 and 14 of the previous year:
+    <.inputs>
+      <label> Day:
+        <input disabled value=day()>
+      <label> Month:
+        <input disabled value=adjustedMonth()>
+      <label> Year:
+        <input disabled value=adjustedYear()>
+    <hr>
+    <div innerHTML=
+      renderToString
+        String.raw`
+          \begin{align*}
+          h &=
+          \underbrace{
+          \left(
+          \underbrace{d}_{${day()}} +
+          \Bigg⌊\underbrace{\frac{13}{5}(\underbrace{m+1}_{${adjustedMonth()+1}})}_{${13/5*(adjustedMonth()+1)}}\Bigg⌋ +
+          \underbrace{y \rem 100}_{${adjustedYear() %% 100}} +
+          \Bigg⌊\underbrace{\frac{y \rem 100}{4}}_{${(adjustedYear() %% 100) / 4}}\Bigg⌋ +
+          \Bigg⌊\underbrace{\frac{y \div 100}{4}}_{${(adjustedYear() %/ 100) / 4}}\Bigg⌋ -
+          \underbrace{2 \, (\underbrace{y \div 100}_{${adjustedYear() %/ 100}})}_{${2 * (adjustedYear() %/ 100)}}
+          \right)
+          }_{${sum()}}
+          \rem 7
+          \\
+          &= ${h()} \quad \text{(${days[h()]})}
+          \end{align*}
+          `
+        displayMode: true
+        macros:
+          [r'\rem']: r'\mathbin{\rm rem}'
+          [r'\div']: r'\mathbin{\rm div}'
+    >
+    <div>
+      where
+      <For each=days>
+        (day, i) =>
+          <span .day>
+            {i()} = {day}
+            {if i() is days# - 1 then '.' else ','}

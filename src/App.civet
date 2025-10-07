@@ -2,8 +2,9 @@
 
 { createSignal, Switch, Match } from solid-js
 { Circle } from ./Circle.civet
+{ Zeller } from './Zeller.civet'
 
-tabTitles := ['Multiplication', 'Addition']
+tabTitles := ['Addition', 'Multiplication', 'Zeller']
 tabTitleToName := (tab) => tab.toLowerCase()
 //tabNames := tabTitles.map tabTitleToName
 
@@ -26,3 +27,5 @@ export function App()
       <Circle neighbor=
         (i: number, n: number, a: number) => (i * a) % n
       >
+    <Match when={activeTab() is 'zeller'}>
+      <Zeller>

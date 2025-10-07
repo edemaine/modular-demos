@@ -37,7 +37,7 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
         y: target.y - dy * shorten / dist
       { from: dot, to: shortenedTo, target }
 
-  <div .component>
+  <div .circle>
     <div .controls>
       <label>
         <i>n</i>:
