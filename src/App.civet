@@ -1,17 +1,31 @@
 "civet jsxCode"
 
-{ createSignal, Switch, Match } from solid-js
+{ createSignal, Switch, Match, onMount, createEffect } from solid-js
 { Circle } from ./Circle.civet
 { Zeller } from './Zeller.civet'
 
 tabTitles := ['Addition', 'Multiplication', 'Zeller']
-tabTitleToName := (tab) => tab.toLowerCase()
-//tabNames := tabTitles.map tabTitleToName
+tabTitleToName: (tab: string) => string := .toLowerCase()
+tabNames := tabTitles.map tabTitleToName
+
+function hashToTab(): string
+  hash := window.location.hash[1..]
+  if hash and hash is in tabNames
+    hash
+  else
+    tabTitleToName tabTitles[0] // first tab by default
 
 export function App()
-  [activeTab, setActiveTab] := createSignal tabTitleToName tabTitles[0]
+  [activeTab, setActiveTab] := createSignal hashToTab()
 
-  <div .tabs>
+  window.addEventListener 'hashchange', =>
+    setActiveTab hashToTab()
+
+  createEffect =>
+    if window.location.hash[1..] !== activeTab()
+      window.location.hash = activeTab()
+
+  <.tabs>
     for tab of tabTitles
       <button class=
         if activeTab() is tabTitleToName tab then 'active'
