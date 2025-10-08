@@ -42,7 +42,7 @@ export function App()
         (i: number, n: number, a: number) => (i * a) % n
       >
     <Match when={activeTab() is 'inverses'}>
-      <Circle noA neighbor=
+      <Circle noA symmetric neighbor=
         (i: number, n: number, a: number) => modInverse i, n
       >
     <Match when={activeTab() is 'zeller'}>

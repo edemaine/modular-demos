@@ -10,6 +10,10 @@ colorMap :=
   . 'indigo'
   . 'violet'
 
+export function Arrow(props: { id: string, fill: string })
+  <marker {props.id} markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto-start-reverse" markerUnits="strokeWidth">
+    <path d="M0,0 L0,3 L4,1.5 z" {props.fill}>
+
 /**
 props.neighbor(i, n, a) should return an index j to draw arrow to,
 or undefined to draw no arrow.
@@ -17,6 +21,7 @@ or undefined to draw no arrow.
 export function Circle(props: {
   neighbor: (i: number, n: number, a: number) => number?
   noA?: boolean
+  symmetric?: boolean
 })
   [n, setN] := createSignal 10
   [a, setA] := createSignal 2
@@ -38,23 +43,26 @@ export function Circle(props: {
     aa := a()
     nn := n()
     dd := dots()
-    for dot, i of dd
+    for source, i of dd
       targetIndex := props.neighbor i, nn, aa
       continue with undefined unless targetIndex?
       target .= dd[targetIndex]
       if targetIndex is i
         target =
           i: i
-          x: (1 + 20 / radius) * (dot.x - centerX) + centerX
-          y: (1 + 20 / radius) * (dot.y - centerY) + centerY
-      dx := target.x - dot.x
-      dy := target.y - dot.y
+          x: (1 + 20 / radius) * (source.x - centerX) + centerX
+          y: (1 + 20 / radius) * (source.y - centerY) + centerY
+      dx := target.x - source.x
+      dy := target.y - source.y
       dist := Math.sqrt dx*dx + dy*dy
       shorten := 5
+      shortenedFrom := if dist <= shorten then target else
+        x: source.x + dx * shorten / dist
+        y: source.y + dy * shorten / dist
       shortenedTo := if dist <= shorten then target else
         x: target.x - dx * shorten / dist
         y: target.y - dy * shorten / dist
-      { from: dot, to: shortenedTo, target }
+      { source, target, from: shortenedFrom, to: shortenedTo }
 
   colors := createMemo =>
     map := new Map<number, number>
@@ -94,17 +102,20 @@ export function Circle(props: {
       <radialGradient #circleGradient cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="purple">
         <stop offset="100%" stop-color="#4B0082">
-      </radialGradient>
+      <Arrow id="arrow-white" fill="white">
       <For each=connections()>
         (conn, i) =>
           color := createMemo => colorMap[colors()[i()] %% colorMap#]
           <Show when=conn>(count) =>
-            <marker id=`arrow-${i()}` markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L0,3 L4,1.5 z" fill=color()>
+            <Arrow id=`arrow-${i()}` fill=color()>
             <linearGradient id=`grad-${i()}` x1={conn!.from.x} y1={conn!.from.y} x2={conn!.to.x} y2={conn!.to.y} gradientUnits="userSpaceOnUse">
               <stop offset="0%" stop-color="white">
               <stop offset="100%" stop-color=color()>
-            <line x1=conn!.from.x y1=conn!.from.y x2=conn!.to.x y2=conn!.to.y stroke=`url(#grad-${i()})` stroke-width=2 marker-end=`url(#arrow-${i()})`>
+            <line x1=conn!.from.x y1=conn!.from.y x2=conn!.to.x y2=conn!.to.y
+             stroke=`url(#grad-${i()})` stroke-width=2
+             marker-end=`url(#arrow-${i()})`
+             marker-start={if props.symmetric and conn!.source.i is not conn!.target.i then "url(#arrow-white)"}
+            >
       <For each=dots()>
         (dot) =>
           <circle cx=dot.x cy=dot.y r=r()>
