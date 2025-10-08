@@ -2,9 +2,10 @@
 
 { createSignal, Switch, Match, onMount, createEffect } from solid-js
 { Circle } from ./Circle.civet
-{ Zeller } from './Zeller.civet'
+{ Zeller } from ./Zeller.civet
+{ modInverse } from ./mod.civet
 
-tabTitles := ['Addition', 'Multiplication', 'Zeller']
+tabTitles := ['Addition', 'Multiplication', 'Inverses', 'Zeller']
 tabTitleToName: (tab: string) => string := .toLowerCase()
 tabNames := tabTitles.map tabTitleToName
 
@@ -39,6 +40,10 @@ export function App()
     <Match when={activeTab() is 'multiplication'}>
       <Circle neighbor=
         (i: number, n: number, a: number) => (i * a) % n
+      >
+    <Match when={activeTab() is 'inverses'}>
+      <Circle noA neighbor=
+        (i: number, n: number, a: number) => modInverse i, n
       >
     <Match when={activeTab() is 'zeller'}>
       <Zeller>

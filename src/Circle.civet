@@ -1,4 +1,4 @@
-{ createMemo, createSignal, For } from 'solid-js'
+{ createMemo, createSignal, For, Show } from 'solid-js'
 
 colorMap :=
   . 'yellow'
@@ -10,7 +10,14 @@ colorMap :=
   . 'indigo'
   . 'violet'
 
-export function Circle(props: {neighbor: (i: number, n: number, a: number) => number})
+/**
+props.neighbor(i, n, a) should return an index j to draw arrow to,
+or undefined to draw no arrow.
+*/
+export function Circle(props: {
+  neighbor: (i: number, n: number, a: number) => number?
+  noA?: boolean
+})
   [n, setN] := createSignal 10
   [a, setA] := createSignal 2
 
@@ -33,6 +40,7 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
     dd := dots()
     for dot, i of dd
       targetIndex := props.neighbor i, nn, aa
+      continue with undefined unless targetIndex?
       target .= dd[targetIndex]
       if targetIndex is i
         target =
@@ -56,10 +64,10 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
     for i of [0..<dd#]
       unless map.has i
         map.set i, color
-        j .= cc[i].target.i
-        until map.has j
+        j .= cc[i]?.target.i
+        while j? and not map.has j
           map.set j, color
-          j = cc[j].target.i
+          j = cc[j]?.target.i
         color++
       map.get(i)!
 
@@ -73,14 +81,15 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
         <input type="number" min=1 max=25 value=n() onInput=
           (e) => setN Number e.target.value
         >
-      <label>
-        <i>a</i>:
-        <input type="range" min=1 max=n() value=a() onInput=
-          (e) => setA Number e.target.value
-        >
-        <input type="number" min=1 max=n() value=a() onInput=
-          (e) => setA Number e.target.value
-        >
+      <Show when={not props.noA}>
+        <label>
+          <i>a</i>:
+          <input type="range" min=1 max=n() value=a() onInput=
+            (e) => setA Number e.target.value
+          >
+          <input type="number" min=1 max=n() value=a() onInput=
+            (e) => setA Number e.target.value
+          >
     <svg viewBox="0 0 100 100">
       <radialGradient #circleGradient cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="purple">
@@ -89,12 +98,13 @@ export function Circle(props: {neighbor: (i: number, n: number, a: number) => nu
       <For each=connections()>
         (conn, i) =>
           color := createMemo => colorMap[colors()[i()] %% colorMap#]
-          <marker id=`arrow-${i()}` markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L0,3 L4,1.5 z" fill=color()>
-          <linearGradient id=`grad-${i()}` x1={conn.from.x} y1={conn.from.y} x2={conn.to.x} y2={conn.to.y} gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="white">
-            <stop offset="100%" stop-color=color()>
-          <line x1=conn.from.x y1=conn.from.y x2=conn.to.x y2=conn.to.y stroke=`url(#grad-${i()})` stroke-width=2 marker-end=`url(#arrow-${i()})`>
+          <Show when=conn>(count) =>
+            <marker id=`arrow-${i()}` markerWidth=5 markerHeight=5 refX=2.5 refY=1.5 orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,3 L4,1.5 z" fill=color()>
+            <linearGradient id=`grad-${i()}` x1={conn!.from.x} y1={conn!.from.y} x2={conn!.to.x} y2={conn!.to.y} gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="white">
+              <stop offset="100%" stop-color=color()>
+            <line x1=conn!.from.x y1=conn!.from.y x2=conn!.to.x y2=conn!.to.y stroke=`url(#grad-${i()})` stroke-width=2 marker-end=`url(#arrow-${i()})`>
       <For each=dots()>
         (dot) =>
           <circle cx=dot.x cy=dot.y r=r()>

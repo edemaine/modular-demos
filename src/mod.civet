@@ -1,0 +1,18 @@
+export function gcd(a: number, b: number): number
+  while b
+    [a, b] = [b, a % b]
+  a
+
+export function modInverse(a: number, m: number): number?
+  //if gcd(a, m) is 1
+  b .= m
+  x .= 1
+  y .= 0
+  while b
+    q := a %/ b
+    [a, b] = [b, a %% b]
+    [x, y] = [y, x - q * y]
+  if a is 1 // a is gcd
+    if x < 0
+      x += m
+    x
