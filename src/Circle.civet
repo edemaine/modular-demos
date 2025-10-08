@@ -27,8 +27,6 @@ export function Circle(props: {
   [a, setA] := createSignal 2
 
   radius := 40
-  centerX := 50
-  centerY := 50
   r := => 6 - n() / 8
 
   dots := createMemo =>
@@ -36,8 +34,8 @@ export function Circle(props: {
     for i of [0..<nn]
       angle := (2 * Math.PI * i) / nn
       i: i
-      x: centerX + radius * Math.cos angle
-      y: centerY + radius * Math.sin angle
+      x: radius * Math.cos angle
+      y: radius * Math.sin angle
 
   connections := createMemo =>
     aa := a()
@@ -50,8 +48,8 @@ export function Circle(props: {
       if targetIndex is i
         target =
           i: i
-          x: (1 + 20 / radius) * (source.x - centerX) + centerX
-          y: (1 + 20 / radius) * (source.y - centerY) + centerY
+          x: (1 + 20 / radius) * source.x
+          y: (1 + 20 / radius) * source.y
       dx := target.x - source.x
       dy := target.y - source.y
       dist := Math.sqrt dx*dx + dy*dy
@@ -98,7 +96,7 @@ export function Circle(props: {
           <input type="number" min=1 max=n() value=a() onInput=
             (e) => setA Number e.target.value
           >
-    <svg viewBox="0 0 100 100">
+    <svg viewBox="-50 -50 100 100">
       <radialGradient #circleGradient cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="purple">
         <stop offset="100%" stop-color="#4B0082">
